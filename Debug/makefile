@@ -16,18 +16,6 @@ RM := rm -rf
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
-ifneq ($(strip $(CC_DEPS)),)
--include $(CC_DEPS)
-endif
-ifneq ($(strip $(C++_DEPS)),)
--include $(C++_DEPS)
-endif
-ifneq ($(strip $(C_UPPER_DEPS)),)
--include $(C_UPPER_DEPS)
-endif
-ifneq ($(strip $(CXX_DEPS)),)
--include $(CXX_DEPS)
-endif
 ifneq ($(strip $(S_DEPS)),)
 -include $(S_DEPS)
 endif
@@ -36,9 +24,6 @@ ifneq ($(strip $(S_UPPER_DEPS)),)
 endif
 ifneq ($(strip $(C_DEPS)),)
 -include $(C_DEPS)
-endif
-ifneq ($(strip $(CPP_DEPS)),)
--include $(CPP_DEPS)
 endif
 endif
 
@@ -50,34 +35,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := Ultrasonic_scanner
+BUILD_ARTIFACT_NAME := workffs
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX := 
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME).$(BUILD_ARTIFACT_EXTENSION)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-Ultrasonic_scanner.elf \
+workffs.elf \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-Ultrasonic_scanner.list \
+workffs.list \
 
 OBJCOPY_BIN += \
-Ultrasonic_scanner.bin \
+workffs.bin \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: Ultrasonic_scanner.elf secondary-outputs
+main-build: workffs.elf secondary-outputs
 
 # Tool invocations
-Ultrasonic_scanner.elf: $(OBJS) $(USER_OBJS) F:\stm32\Ultrasonic_scanner\STM32F401RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "Ultrasonic_scanner.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"F:\stm32\Ultrasonic_scanner\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Ultrasonic_scanner.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+workffs.elf: $(OBJS) $(USER_OBJS) F:\stm32\Ultrasonic\ scanner\ v2\Hope_it_works_this_time\workffs\STM32F410RBTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "workffs.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"F:\stm32\Ultrasonic scanner v2\Hope_it_works_this_time\workffs\STM32F410RBTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="workffs.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -u _scanf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -86,13 +71,13 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-Ultrasonic_scanner.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "Ultrasonic_scanner.list"
+workffs.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "workffs.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
-Ultrasonic_scanner.bin: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "Ultrasonic_scanner.bin"
+workffs.bin: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "workffs.bin"
 	@echo 'Finished building: $@'
 	@echo ' '
 
