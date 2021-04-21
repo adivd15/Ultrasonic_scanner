@@ -1,33 +1,22 @@
 /* USER CODE BEGIN Header */
-/**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
+/*
+ *
+*/
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 #define usTIM	TIM5
+#define PI 3.14159265
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -57,6 +46,7 @@ static void MX_TIM5_Init(void);
 static void MX_TIM9_Init(void);
 /* USER CODE BEGIN PFP */
 void usDelay(uint32_t uSec);
+float measureDistance();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -75,7 +65,8 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 	uint32_t numTicks = 0;
-	int n=25;
+	float servo_angle_base=25.5;
+	float servo_angle_joint=75.5;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -137,17 +128,23 @@ int main(void)
 	  		distance = (numTicks + 0.0f)*2.8*speedOfSound;
 
 	  		//5. Print to UART terminal for debugging
-	  		sprintf(uartBuf, "Distance (cm)  = %.1f\r\n", distance);
 	  		if(distance>150){
 	  			HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_5);
 	  		}
 	  		HAL_UART_Transmit(&huart2, (uint8_t *)uartBuf, strlen(uartBuf), 100);
-	  		htim9.Instance->CCR1 = n;
-	  		htim9.Instance->CCR2 = n;
-	  		n=n+1;
-	  		if(n>125){
-	  			n=25;
+	  		htim9.Instance->CCR1 = servo_angle_base;
+	  		htim9.Instance->CCR2 = servo_angle_joint;
+	  		servo_angle_base+=1;
+	  		if(servo_angle_base>120){
+	  			servo_angle_base=25.5;
+	  			servo_angle_joint-=1;
 	  		}
+	  		double angle=servo_angle_base-25.5;
+	  		double x_cord=distance*cos(angle*PI/180);
+	  		double y_cord=distance*sin(angle*PI/180);
+	  		double angle_2=90-angle;
+	  		double z_cord=distance*cos(angle_2*PI/180);
+	  		sprintf(uartBuf, "X coordinate of the point  = %.1f; Y coordinate of the point = %.1f; Z coordinate of the point =%.1f \r\n", x_cord, y_cord, z_cord);
 	  		HAL_Delay(1000);
 	  		  // duty cycle is .5 ms
 
@@ -377,8 +374,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void usDelay(uint32_t uSec)
-{
+void usDelay(uint32_t uSec){
 	if(uSec < 2) uSec = 2;
 	usTIM->ARR = uSec - 1; 	/*sets the value in the auto-reload register*/
 	usTIM->EGR = 1; 			/*Re-initialises the timer*/
@@ -387,6 +383,7 @@ void usDelay(uint32_t uSec)
 	while((usTIM->SR&0x0001) != 1);
 	usTIM->SR &= ~(0x0001);
 }
+
 /* USER CODE END 4 */
 
 /**
